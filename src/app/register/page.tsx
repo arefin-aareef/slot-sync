@@ -36,10 +36,9 @@ const RegisterPage: FC<RegisterPageProps> = ({}) => {
 				});
 			}
 			alert('User Registered Successfully.');
-			console.log('User Registered Successfully!!');
+			window.location.href = '/login';
 		} catch (error) {
-			console.log(error);
-			alert(error);
+			alert('User Registered Failed.');
 		}
 	};
 

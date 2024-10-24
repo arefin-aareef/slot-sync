@@ -1,4 +1,4 @@
-import { Flex, FlexProps } from '@chakra-ui/react';
+import { FlexProps } from '@chakra-ui/react';
 import React, { FC } from 'react';
 import Navbar from './Navbar';
 import Column from './Column';
@@ -9,20 +9,7 @@ type PageLayoutProps = FlexProps & {
 };
 
 const PageLayout: FC<PageLayoutProps> = ({ children, ...props }) => {
-	// HOOKS
 	const pathname = usePathname();
-	// STATE
-
-	// VARIABLES
-
-	// STYLES
-
-	// FUNCTIONS
-
-	// EFFECTS
-
-	// COMPONENTS
-
 	return (
 		<Column minH={'100vh'}>
 			{pathname !== '/login' && pathname !== '/register' && <Navbar />}

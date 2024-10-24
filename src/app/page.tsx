@@ -1,7 +1,5 @@
 'use client';
-
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import React from 'react';
 import PageLayout from '@/components/PageLayout';
 import {
 	Table,
@@ -12,28 +10,22 @@ import {
 	Td,
 	TableContainer,
 } from '@chakra-ui/react';
-import { db } from '../../firebase';
 import Column from '@/components/Column';
+import useFetchAllUser from '@/hooks/useFetchAllUser';
+import useRequireAuth from '@/hooks/useRequireAuth';
+import Loader from '@/components/Loader';
 
 const Home: React.FC = () => {
-	const [users, setUsers] = useState<any[]>([]);
+	const { users, loading, error } = useFetchAllUser();
+	const { authLoading } = useRequireAuth();
 
-	const fetchUsers = async () => {
-		try {
-			const querySnapshot = await getDocs(collection(db, 'Users'));
-			const usersData = querySnapshot.docs.map(doc => ({
-				id: doc.id,
-				...doc.data(),
-			}));
-			setUsers(usersData);
-		} catch (error) {
-			console.error('Error fetching users:', error);
-		}
-	};
+	if (authLoading || loading) {
+		return <Loader />;
+	}
 
-	useEffect(() => {
-		fetchUsers();
-	}, []);
+	if (error) {
+		return <div>{error}</div>;
+	}
 
 	return (
 		<PageLayout>
@@ -42,7 +34,6 @@ const Home: React.FC = () => {
 					<Table variant='simple'>
 						<Thead>
 							<Tr>
-								{/* <Th>ID</Th> */}
 								<Th>Name</Th>
 								<Th>Email</Th>
 							</Tr>
@@ -50,7 +41,6 @@ const Home: React.FC = () => {
 						<Tbody>
 							{users.map(user => (
 								<Tr key={user.id}>
-									{/* <Td>{user.id}</Td> */}
 									<Td>{user.name}</Td>
 									<Td>{user.email}</Td>
 								</Tr>

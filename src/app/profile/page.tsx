@@ -1,71 +1,37 @@
-'use client'
-import React, { FC, useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../../../firebase';
+'use client';
+import React, { FC } from 'react';
 import PageLayout from '@/components/PageLayout';
+import useFetchAUser from '@/hooks/useFetchAUser';
+import useRequireAuth from '@/hooks/useRequireAuth';
+import Loader from '@/components/Loader';
 
 type ProfilePageProps = {};
 
 const ProfilePage: FC<ProfilePageProps> = ({}) => {
-	// HOOKS
-	const [userDetails, setUserDetails] = useState<any>(null);
-	const fetchUserData = async () => {
-		auth.onAuthStateChanged(async (user: any) => {
-			console.log(user);
+	const { user, loading } = useFetchAUser();
+	const { authLoading } = useRequireAuth();
 
-			const docRef = doc(db, 'Users', user.uid);
-			const docSnap = await getDoc(docRef);
-			if (docSnap.exists()) {
-				setUserDetails(docSnap.data());
-				console.log(docSnap.data());
-			} else {
-				console.log('User is not logged in');
-			}
-		});
-	};
-	useEffect(() => {
-		fetchUserData();
-	}, []);
-	// STATE
-
-	// VARIABLES
-
-	// STYLES
-
-	// FUNCTIONS
-	async function handleLogout() {
-		try {
-			await auth.signOut();
-			window.location.href = '/login';
-			console.log('User logged out successfully!');
-		} catch (error) {
-			console.error('Error logging out:', error);
-		}
+	if (authLoading || loading) {
+		return <Loader />;
 	}
-
-	// EFFECTS
-
-	// COMPONENTS
 
 	return (
 		<PageLayout>
 			<div>
-				{userDetails ? (
+				{user ? (
 					<>
 						<div style={{ display: 'flex', justifyContent: 'center' }}>
 							<img
-								src={userDetails.photo}
+								src={user.photo}
 								width={'40%'}
 								style={{ borderRadius: '50%' }}
 							/>
 						</div>
-						<h3>Welcome {userDetails.name} 🙏🙏</h3>
+						<h3>Welcome {user.name} 🙏🙏</h3>
 						<div>
-							<p>Email: {userDetails.email}</p>
-							<p>Name: {userDetails.name}</p>
-							{/* <p>Last Name: {userDetails.lastName}</p> */}
+							<p>Email: {user.email}</p>
+							<p>Name: {user.name}</p>
 						</div>
-					
 					</>
 				) : (
 					<p>Loading...</p>
