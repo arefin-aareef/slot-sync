@@ -77,7 +77,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 					<Flex gap={2}>
 						<Button
 							size={'sm'}
-							colorScheme='green'
+							colorScheme='red'
 							onClick={() => updateAppointmentStatus('canceled')}
 						>
 							Cancel

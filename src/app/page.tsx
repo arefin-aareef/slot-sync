@@ -19,7 +19,6 @@ import useRequireAuth from '@/hooks/useRequireAuth';
 import Loader from '@/components/Loader';
 import AppointmentModal from '@/components/AppointmentModal';
 
-// Define a type for the user
 type User = {
 	id: string;
 	name: string;
@@ -27,7 +26,7 @@ type User = {
 };
 
 const Home: React.FC = () => {
-	const { users, loading, error } = useFetchAllUser();
+	const { users, loading } = useFetchAllUser();
 	const { authLoading } = useRequireAuth();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -35,10 +34,6 @@ const Home: React.FC = () => {
 
 	if (authLoading || loading) {
 		return <Loader />;
-	}
-
-	if (error) {
-		return <div>{error}</div>;
 	}
 
 	const filteredUsers = users?.filter(
@@ -61,6 +56,7 @@ const Home: React.FC = () => {
 					onChange={e => setSearchTerm(e.target.value)}
 					focusBorderColor='green.300'
 					mb={4}
+					
 				/>
 
 				<TableContainer>

@@ -13,7 +13,6 @@ const Navbar: FC<NavbarProps> = ({}) => {
 	async function handleLogout() {
 		try {
 			await auth.signOut();
-			window.location.href = '/login';
 			console.log('User logged out successfully!');
 		} catch (error) {
 			console.error('Error logging out:', error);
@@ -32,24 +31,28 @@ const Navbar: FC<NavbarProps> = ({}) => {
 			justifyContent={'space-between'}
 		>
 			<Flex w={'full'}>
-				<Text fontSize={{ base: '1rem' , lg: '1.5rem' }} color={'white'}>
-					Welcome {user?.name}
-				</Text>
+				<Link href={'/'}>
+					<Text fontSize={{ base: '1rem', lg: '1.5rem' }} color={'white'}>
+						Welcome, {user?.name}
+					</Text>
+				</Link>
 			</Flex>
 			<Flex w={'full'} gap={2} justifyContent={'flex-end'}>
-				<Link href={'/'}>
-					<Button size='sm'>Home</Button>
+				<Link href={'/appointments'}>
+					<Button size={{ base: 'xs', md: 'sm' }}>Appointments</Button>
 				</Link>
 				<Link href={'/profile'}>
-					<Button size='sm'>Profile</Button>
+					<Button size={{ base: 'xs', md: 'sm' }}>History</Button>
 				</Link>
 				{isLoggedIn ? (
-					<Button size='sm' onClick={handleLogout}>
-						Logout
-					</Button>
+					<Link href={'/login'}>
+						<Button size={{ base: 'xs', md: 'sm' }} onClick={handleLogout}>
+							Logout
+						</Button>
+					</Link>
 				) : (
 					<Link href={'/login'}>
-						<Button size='sm'>Login</Button>
+						<Button size={{ base: 'xs', md: 'sm' }}>Login</Button>
 					</Link>
 				)}
 			</Flex>
