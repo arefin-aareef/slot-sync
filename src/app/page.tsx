@@ -56,11 +56,10 @@ const Home: React.FC = () => {
 					onChange={e => setSearchTerm(e.target.value)}
 					focusBorderColor='green.300'
 					mb={4}
-					
 				/>
 
 				<TableContainer>
-					<Table variant='simple'>
+					<Table variant='simple' size={{ base: 'sm', md: 'md' }}>
 						<Thead>
 							<Tr>
 								<Th>Name</Th>

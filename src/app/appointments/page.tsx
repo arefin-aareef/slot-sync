@@ -92,26 +92,18 @@ const AppointmentPage: FC<AppointmentPageProps> = ({}) => {
 	return (
 		<PageLayout>
 			<Column>
-				<Flex
-					mb={4}
-					alignItems='center'
-					gap={2}
-          justifyContent={'center'}
-				>
+				<Flex mb={4} alignItems='center' gap={2} justifyContent={'center'}>
 					<Input
 						placeholder='Search by title, type, or status'
 						value={searchTerm}
 						onChange={e => setSearchTerm(e.target.value)}
 						focusBorderColor='green.300'
-						size={{ base: 'xs', md: 'sm' }}
-            mt='2px'
 					/>
 					<Select
 						value={sortOrder}
 						onChange={e => setSortOrder(e.target.value as 'latest' | 'oldest')}
-						w='250px'
+						w={{ base: '150px', md: '250px' }}
 						focusBorderColor='green.300'
-						size={{ base: 'xs', md: 'sm' }}
 					>
 						<option value='latest'>Latest first</option>
 						<option value='oldest'>Oldest first</option>

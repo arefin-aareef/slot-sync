@@ -1,14 +1,29 @@
-import { Button, Flex, Text } from '@chakra-ui/react';
+import {
+	Button,
+	Flex,
+	Text,
+	Drawer,
+	DrawerBody,
+	DrawerHeader,
+	DrawerOverlay,
+	DrawerContent,
+	useDisclosure,
+	IconButton,
+	DrawerCloseButton,
+} from '@chakra-ui/react';
 import Link from 'next/link';
 import React, { FC } from 'react';
 import { auth } from '../../firebase';
 import useRequireAuth from '@/hooks/useRequireAuth';
 import useFetchAUser from '@/hooks/useFetchAUser';
+import { GiHamburgerMenu } from 'react-icons/gi';
 
 type NavbarProps = {};
 
 const Navbar: FC<NavbarProps> = ({}) => {
 	const { isLoggedIn } = useRequireAuth();
+	const { user } = useFetchAUser();
+	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	async function handleLogout() {
 		try {
@@ -18,8 +33,6 @@ const Navbar: FC<NavbarProps> = ({}) => {
 			console.error('Error logging out:', error);
 		}
 	}
-
-	const { user } = useFetchAUser();
 
 	return (
 		<Flex
@@ -37,7 +50,22 @@ const Navbar: FC<NavbarProps> = ({}) => {
 					</Text>
 				</Link>
 			</Flex>
-			<Flex w={'full'} gap={2} justifyContent={'flex-end'}>
+
+			{/* Hamburger Icon for Mobile */}
+			<IconButton
+				aria-label='Open Menu'
+				icon={<GiHamburgerMenu />}
+				onClick={onOpen}
+				display={{ base: 'flex', md: 'none' }}
+			/>
+
+			{/* Desktop Menu */}
+			<Flex
+				w={'full'}
+				gap={2}
+				justifyContent={'flex-end'}
+				display={{ base: 'none', md: 'flex' }}
+			>
 				<Link href={'/appointments'}>
 					<Button size={{ base: 'xs', md: 'sm' }}>Appointments</Button>
 				</Link>
@@ -45,17 +73,49 @@ const Navbar: FC<NavbarProps> = ({}) => {
 					<Button size={{ base: 'xs', md: 'sm' }}>History</Button>
 				</Link>
 				{isLoggedIn ? (
-					<Link href={'/login'}>
-						<Button size={{ base: 'xs', md: 'sm' }} onClick={handleLogout}>
-							Logout
-						</Button>
-					</Link>
+					<Button size={{ base: 'xs', md: 'sm' }} onClick={handleLogout}>
+						Logout
+					</Button>
 				) : (
 					<Link href={'/login'}>
 						<Button size={{ base: 'xs', md: 'sm' }}>Login</Button>
 					</Link>
 				)}
 			</Flex>
+
+			{/* Drawer for Mobile Menu */}
+			<Drawer isOpen={isOpen} placement='right' onClose={onClose}>
+				<DrawerOverlay />
+				<DrawerContent>
+					<DrawerCloseButton />
+					<DrawerHeader>Menu</DrawerHeader>
+					<DrawerBody>
+						<Flex direction='column' gap={2}>
+							<Link href={'/appointments'} onClick={onClose}>
+								<Button width='full' colorScheme='green' variant={'outline'}>Appointments</Button>
+							</Link>
+							<Link href={'/profile'} onClick={onClose}>
+								<Button width='full' colorScheme='green' variant={'outline'}>History</Button>
+							</Link>
+							{isLoggedIn ? (
+								<Button
+									width='full' colorScheme='green' variant={'outline'}
+									onClick={() => {
+										handleLogout();
+										onClose();
+									}}
+								>
+									Logout
+								</Button>
+							) : (
+								<Link href={'/login'} onClick={onClose}>
+									<Button width='full' colorScheme='green' variant={'outline'}>Login</Button>
+								</Link>
+							)}
+						</Flex>
+					</DrawerBody>
+				</DrawerContent>
+			</Drawer>
 		</Flex>
 	);
 };
