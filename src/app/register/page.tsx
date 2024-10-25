@@ -7,22 +7,19 @@ import React, { FC, useState } from 'react';
 import { auth, db } from '../../../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import useToast from '@/hooks/useCustomToast';
+import useCustomToast from '@/hooks/useCustomToast';
+import { useRouter } from 'next/navigation';
 
 type RegisterPageProps = {};
 
 const RegisterPage: FC<RegisterPageProps> = ({}) => {
-	// HOOKS
-
-	// STATE
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
-	// VARIABLES
-
-	// STYLES
-
-	// FUNCTIONS
+		const showToast = useCustomToast();
+		const router = useRouter();
 
 	const handleRegister = async (e: any) => {
 		e.preventDefault();
@@ -35,10 +32,15 @@ const RegisterPage: FC<RegisterPageProps> = ({}) => {
 					name: name,
 				});
 			}
-			alert('User Registered Successfully.');
-			window.location.href = '/login';
+			showToast('Registration Successful.', 'User Registered', 'success');
+			router.push('/');
 		} catch (error) {
-			alert('User Registered Failed.');
+			showToast(
+				'Registration failed.',
+				'Please try again.',
+				'error'
+			);
+			console.log('Registration error: ', error);
 		}
 	};
 
@@ -49,15 +51,15 @@ const RegisterPage: FC<RegisterPageProps> = ({}) => {
 	return (
 		<PageLayout alignItems={'center'} justifyContent={'center'} minH={'90vh'}>
 			<form onSubmit={handleRegister}>
-			<Column
-				border='1px'
-				borderColor={'gray.300'}
-				borderRadius={'10px'}
-				w={'360px'}
-				direction={'column'}
-				p={'12px'}
-				gap={4}
-			>
+				<Column
+					border='1px'
+					borderColor={'gray.300'}
+					borderRadius={'10px'}
+					w={'360px'}
+					direction={'column'}
+					p={'12px'}
+					gap={4}
+				>
 					<Heading textAlign={'center'}>Register</Heading>
 					<Column>
 						<Text>Name</Text>
@@ -97,8 +99,8 @@ const RegisterPage: FC<RegisterPageProps> = ({}) => {
 							<Text _hover={{ color: 'blue' }}>Login here!</Text>
 						</Link>
 					</Flex>
-			</Column>
-				</form>
+				</Column>
+			</form>
 		</PageLayout>
 	);
 };

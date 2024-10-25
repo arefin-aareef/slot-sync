@@ -6,21 +6,26 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import Link from 'next/link';
 import React, { FC, useState } from 'react';
 import { auth } from '../../../firebase';
+import useCustomToast from '@/hooks/useCustomToast';
+import { useRouter } from 'next/navigation';
 
 type LoginPageProps = {};
 
 const LoginPage: FC<LoginPageProps> = ({}) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const showToast = useCustomToast();
+	const router = useRouter();
 
 	const handleLogin = async (e: any) => {
 		e.preventDefault();
 		try {
 			await signInWithEmailAndPassword(auth, email, password);
-			window.location.href = '/';
-			alert('User logged in Successfully');
+			showToast('Login successful.', 'User logged in', 'success');
+			router.push('/');
 		} catch (error) {
-			alert('Login failed.');
+			showToast('Login failed.', 'Please check your credentials.', 'error');
+			console.log('Registration error: ', error);
 		}
 	};
 
