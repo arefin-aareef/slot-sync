@@ -1,8 +1,9 @@
-import { Button, Flex } from '@chakra-ui/react';
+import { Button, Flex, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import React, { FC } from 'react';
 import { auth } from '../../firebase';
 import useRequireAuth from '@/hooks/useRequireAuth';
+import useFetchAUser from '@/hooks/useFetchAUser';
 
 type NavbarProps = {};
 
@@ -19,6 +20,8 @@ const Navbar: FC<NavbarProps> = ({}) => {
 		}
 	}
 
+	const { user } = useFetchAUser();
+
 	return (
 		<Flex
 			w={'full'}
@@ -26,24 +29,28 @@ const Navbar: FC<NavbarProps> = ({}) => {
 			h='60px'
 			alignItems={'center'}
 			px={{ base: '20px', md: '120px' }}
-			justifyContent={'flex-end'}
-			gap={2}
+			justifyContent={'space-between'}
 		>
-			<Link href={'/'}>
-				<Button size='sm'>Home</Button>
-			</Link>
-			<Link href={'/profile'}>
-				<Button size='sm'>Profile</Button>
-			</Link>
-			{isLoggedIn ? (
-				<Button size='sm' onClick={handleLogout}>
-					Logout
-				</Button>
-			) : (
-				<Link href={'/login'}>
-					<Button size='sm'>Login</Button>
+			<Flex w={'full'}>
+				<Text fontSize={'1.5rem'} color={'white'}>Welcome {user?.name}</Text>
+			</Flex>
+			<Flex w={'full'} gap={2} justifyContent={'flex-end'}>
+				<Link href={'/'}>
+					<Button size='sm'>Home</Button>
 				</Link>
-			)}
+				<Link href={'/profile'}>
+					<Button size='sm'>Profile</Button>
+				</Link>
+				{isLoggedIn ? (
+					<Button size='sm' onClick={handleLogout}>
+						Logout
+					</Button>
+				) : (
+					<Link href={'/login'}>
+						<Button size='sm'>Login</Button>
+					</Link>
+				)}
+			</Flex>
 		</Flex>
 	);
 };

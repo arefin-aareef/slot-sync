@@ -1,11 +1,13 @@
 import { collection, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../../firebase';
+import useFetchAUser from './useFetchAUser';
 
 const useFetchAllUser = () => {
 	const [users, setUsers] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
+	const { user } = useFetchAUser();
 
 	const fetchUsers = async () => {
 		try {
@@ -28,7 +30,10 @@ const useFetchAllUser = () => {
 		fetchUsers();
 	}, []);
 
-	return { users, loading, error };
+	// Filter out the logged-in user from the users array
+	const allUserExceptMe = users.filter(item => item.uid !== user?.uid);
+
+	return { users: allUserExceptMe, loading, error };
 };
 
 export default useFetchAllUser;

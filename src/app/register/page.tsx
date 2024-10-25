@@ -18,35 +18,34 @@ const RegisterPage: FC<RegisterPageProps> = ({}) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
-		const showToast = useCustomToast();
-		const router = useRouter();
+	const showToast = useCustomToast();
+	const router = useRouter();
 
 	const handleRegister = async (e: any) => {
 		e.preventDefault();
 		try {
-			await createUserWithEmailAndPassword(auth, email, password);
-			const user = auth.currentUser;
+			const userCredential = await createUserWithEmailAndPassword(
+				auth,
+				email,
+				password
+			);
+			const user = userCredential.user;
+
 			if (user) {
 				await setDoc(doc(db, 'Users', user.uid), {
+					uid: user.uid,
 					email: user.email,
 					name: name,
 				});
 			}
+
 			showToast('Registration Successful.', 'User Registered', 'success');
 			router.push('/');
 		} catch (error) {
-			showToast(
-				'Registration failed.',
-				'Please try again.',
-				'error'
-			);
+			showToast('Registration failed.', 'Please try again.', 'error');
 			console.log('Registration error: ', error);
 		}
 	};
-
-	// EFFECTS
-
-	// COMPONENTS
 
 	return (
 		<PageLayout alignItems={'center'} justifyContent={'center'} minH={'90vh'}>
