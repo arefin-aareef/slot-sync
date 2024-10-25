@@ -6,13 +6,11 @@ import AppointmentCard from './AppointmentCard';
 type AppointmentContainerProps = {
 	heading: string;
 	appointments: any;
-	handleRefetch: () => void;
 };
 
 const AppointmentContainer: FC<AppointmentContainerProps> = ({
 	heading,
 	appointments,
-	handleRefetch,
 }) => {
 	const title = heading?.split(' ')[0].toLowerCase();
 	return (
@@ -31,7 +29,6 @@ const AppointmentContainer: FC<AppointmentContainerProps> = ({
 					appointments.map((appointment: any) => (
 						<AppointmentCard
 							appointment={appointment}
-							handleRefetch={handleRefetch}
 						/>
 					))
 				) : (

@@ -10,12 +10,6 @@ import {
 	Td,
 	TableContainer,
 	Button,
-	Modal,
-	ModalContent,
-	ModalHeader,
-	ModalCloseButton,
-	ModalBody,
-	ModalFooter,
 	useDisclosure,
 } from '@chakra-ui/react';
 import Column from '@/components/Column';
@@ -35,7 +29,7 @@ const Home: React.FC = () => {
 	const { users, loading, error } = useFetchAllUser();
 	const { authLoading } = useRequireAuth();
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [selectedUser, setSelectedUser] = useState<User | null>(null); // Specify the type for selectedUser
+	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
 	console.log('users', users);
 	if (authLoading || loading) {

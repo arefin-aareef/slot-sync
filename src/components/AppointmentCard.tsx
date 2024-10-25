@@ -5,17 +5,12 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import useCustomToast from '@/hooks/useCustomToast';
 import useFetchAUser from '@/hooks/useFetchAUser';
-import { usedDynamicAPIs } from 'next/dist/server/app-render/dynamic-rendering';
 
 type AppointmentCardProps = FlexProps & {
 	appointment: any;
-	handleRefetch: () => void;
 };
 
-const AppointmentCard: FC<AppointmentCardProps> = ({
-	appointment,
-	handleRefetch,
-}) => {
+const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 	const { user } = useFetchAUser();
 
 	console.log('user', user);
@@ -31,12 +26,18 @@ const AppointmentCard: FC<AppointmentCardProps> = ({
 				`You have ${newStatus} the appointment.`,
 				'success'
 			);
-			handleRefetch();
+			window.location.reload();
 		} catch (error) {
 			console.error('Error updating appointment status:', error);
 		}
 	};
 
+	const appointmentDateTime = new Date(
+		`${appointment.date}T${appointment.time}`
+	);
+	const currentDateTime = new Date();
+	console.log('appointmentDateTime', appointmentDateTime);
+	console.log('currentDateTime', currentDateTime);
 	return (
 		<Column
 			key={appointment.id}

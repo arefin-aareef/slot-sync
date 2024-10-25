@@ -1,5 +1,5 @@
 'use client';
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import PageLayout from '@/components/PageLayout';
 import useFetchPendingAppointments from '@/hooks/useFetchPendingAppointments';
 import useRequireAuth from '@/hooks/useRequireAuth';
@@ -10,6 +10,7 @@ import useFetchDeclinedAppointments from '@/hooks/useFetchDeclinedAppointments';
 import useFetchCreatedAppointments from '@/hooks/useFetchCreatedAppointments';
 import useFetchCanceledAppointments from '@/hooks/useFetchCanceledAppointments';
 import AppointmentContainer from '@/components/AppointmentContainer';
+import useFetchPastAppointments from '@/hooks/useFetchPastAppointments';
 
 type ProfilePageProps = {};
 
@@ -21,14 +22,12 @@ const ProfilePage: FC<ProfilePageProps> = ({}) => {
 	const { declinedAppointments } = useFetchDeclinedAppointments();
 	const { createdAppointments } = useFetchCreatedAppointments();
 	const { canceledAppointments } = useFetchCanceledAppointments();
-
-	const [refetchTrigger, setRefetchTrigger] = useState(false);
+	const { pastAppointments } = useFetchPastAppointments();
 
 	if (authLoading) {
 		return <Loader />;
 	}
 
-	const handleRefetch = () => setRefetchTrigger(prev => !prev);
 
 	return (
 		<PageLayout>
@@ -36,31 +35,31 @@ const ProfilePage: FC<ProfilePageProps> = ({}) => {
 				<AppointmentContainer
 					heading='Created Appointments'
 					appointments={createdAppointments}
-					handleRefetch={handleRefetch}
 				/>
 
 				<AppointmentContainer
 					heading='Upcoming Appointments'
 					appointments={pendingAppointments}
-					handleRefetch={handleRefetch}
 				/>
 
 				<AppointmentContainer
 					heading='Accepted Appointments'
 					appointments={acceptedAppointments}
-					handleRefetch={handleRefetch}
 				/>
 
 				<AppointmentContainer
 					heading='Declined Appointments'
 					appointments={declinedAppointments}
-					handleRefetch={handleRefetch}
 				/>
 
 				<AppointmentContainer
 					heading='Canceled Appointments'
 					appointments={canceledAppointments}
-					handleRefetch={handleRefetch}
+				/>
+
+				<AppointmentContainer
+					heading='Past Appointments'
+					appointments={pastAppointments}
 				/>
 			</Column>
 		</PageLayout>
