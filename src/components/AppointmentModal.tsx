@@ -16,6 +16,7 @@ import {
 import React, { FC, useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import useCustomToast from '@/hooks/useCustomToast';
 
 type AppointmentModalProps = ModalBodyProps & {
 	isOpen: boolean;
@@ -28,17 +29,25 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 	onClose,
 	selectedUser,
 }) => {
-	const { user } = useFetchAUser(); // Get the logged-in user
+	const { user } = useFetchAUser();
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [date, setDate] = useState('');
 	const [time, setTime] = useState('');
+	const showToast = useCustomToast();
+
+	const resetAll = () => {
+		setTitle('');
+		setDescription('');
+		setDate('');
+		setTime('');
+	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!title || !description || !date || !time ) {
-			alert('Please fill in all fields'); // Basic validation
+		if (!title || !description || !date || !time) {
+			showToast('Empty fields', 'Please fill in all fields', 'error');
 			return;
 		}
 
@@ -49,7 +58,7 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 			time,
 			invitee: selectedUser?.id,
 			appointee: user.uid,
-			status: 'pending', // Set the status
+			status: 'pending',
 		};
 
 		try {
@@ -57,8 +66,13 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 				collection(db, 'appointments'),
 				appointmentData
 			);
-			console.log('Appointment created with ID: ', docRef.id);
-			onClose(); // Close the modal after successful submission
+			showToast(
+				'Appointment added',
+				`Appointment created with ${selectedUser?.name}`,
+				'success'
+			);
+			resetAll();
+			onClose();
 		} catch (error) {
 			console.error('Error adding document: ', error);
 		}

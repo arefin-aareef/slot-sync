@@ -32,7 +32,9 @@ const Navbar: FC<NavbarProps> = ({}) => {
 			justifyContent={'space-between'}
 		>
 			<Flex w={'full'}>
-				<Text fontSize={'1.5rem'} color={'white'}>Welcome {user?.name}</Text>
+				<Text fontSize={{ base: '1rem' , lg: '1.5rem' }} color={'white'}>
+					Welcome {user?.name}
+				</Text>
 			</Flex>
 			<Flex w={'full'} gap={2} justifyContent={'flex-end'}>
 				<Link href={'/'}>

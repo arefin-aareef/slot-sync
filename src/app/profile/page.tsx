@@ -1,42 +1,68 @@
 'use client';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
-import useFetchAUser from '@/hooks/useFetchAUser';
+import useFetchPendingAppointments from '@/hooks/useFetchPendingAppointments';
 import useRequireAuth from '@/hooks/useRequireAuth';
 import Loader from '@/components/Loader';
+import Column from '@/components/Column';
+import useFetchAcceptedAppointments from '@/hooks/useFetchAcceptedAppointments';
+import useFetchDeclinedAppointments from '@/hooks/useFetchDeclinedAppointments';
+import useFetchCreatedAppointments from '@/hooks/useFetchCreatedAppointments';
+import useFetchCanceledAppointments from '@/hooks/useFetchCanceledAppointments';
+import AppointmentContainer from '@/components/AppointmentContainer';
 
 type ProfilePageProps = {};
 
 const ProfilePage: FC<ProfilePageProps> = ({}) => {
-	const { user, loading } = useFetchAUser();
 	const { authLoading } = useRequireAuth();
 
-	if (authLoading || loading) {
+	const { pendingAppointments } = useFetchPendingAppointments();
+	const { acceptedAppointments } = useFetchAcceptedAppointments();
+	const { declinedAppointments } = useFetchDeclinedAppointments();
+	const { createdAppointments } = useFetchCreatedAppointments();
+	const { canceledAppointments } = useFetchCanceledAppointments();
+
+	const [refetchTrigger, setRefetchTrigger] = useState(false);
+
+	if (authLoading) {
 		return <Loader />;
 	}
 
+	const handleRefetch = () => setRefetchTrigger(prev => !prev);
+
 	return (
 		<PageLayout>
-			<div>
-				{user ? (
-					<>
-						<div style={{ display: 'flex', justifyContent: 'center' }}>
-							<img
-								src={user.photo}
-								width={'40%'}
-								style={{ borderRadius: '50%' }}
-							/>
-						</div>
-						<h3>Welcome {user.name} 🙏🙏</h3>
-						<div>
-							<p>Email: {user.email}</p>
-							<p>Name: {user.name}</p>
-						</div>
-					</>
-				) : (
-					<p>Loading...</p>
-				)}
-			</div>
+			<Column gap={4}>
+				<AppointmentContainer
+					heading='Created Appointments'
+					appointments={createdAppointments}
+					handleRefetch={handleRefetch}
+				/>
+
+				<AppointmentContainer
+					heading='Upcoming Appointments'
+					appointments={pendingAppointments}
+					handleRefetch={handleRefetch}
+				/>
+
+				<AppointmentContainer
+					heading='Accepted Appointments'
+					appointments={acceptedAppointments}
+					handleRefetch={handleRefetch}
+				/>
+
+				<AppointmentContainer
+					heading='Declined Appointments'
+					appointments={declinedAppointments}
+					handleRefetch={handleRefetch}
+				/>
+
+				<AppointmentContainer
+					heading='Canceled Appointments'
+					appointments={canceledAppointments}
+					handleRefetch={handleRefetch}
+				/>
+			</Column>
 		</PageLayout>
 	);
 };

@@ -13,7 +13,7 @@ const PageLayout: FC<PageLayoutProps> = ({ children, ...props }) => {
 	return (
 		<Column minH={'100vh'}>
 			{pathname !== '/login' && pathname !== '/register' && <Navbar />}
-			<Column px={{base: '20px', md: '120px'}} {...props}>
+			<Column px={{base: '20px', md: '120px'}} {...props} py={'20px'}>
 				{children}
 			</Column>
 		</Column>
