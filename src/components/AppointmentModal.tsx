@@ -1,5 +1,4 @@
 import useFetchAUser from '@/hooks/useFetchAUser';
-import useFetchAllUser from '@/hooks/useFetchAllUser'; // Assuming this hook fetches all users except the logged-in user
 import {
 	Button,
 	Modal,
@@ -7,11 +6,10 @@ import {
 	ModalBodyProps,
 	ModalCloseButton,
 	ModalContent,
-	ModalFooter,
 	ModalHeader,
-	Select,
 	Input,
 	Textarea,
+	Flex,
 } from '@chakra-ui/react';
 import React, { FC, useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
@@ -35,6 +33,9 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 	const [date, setDate] = useState('');
 	const [time, setTime] = useState('');
 	const showToast = useCustomToast();
+
+	const today = new Date();
+	const currentTime = today.toTimeString().split(' ')[0].slice(0, 5);
 
 	const resetAll = () => {
 		setTitle('');
@@ -67,8 +68,8 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 				appointmentData
 			);
 			showToast(
-				'Appointment added',
-				`Appointment created with ${selectedUser?.name}`,
+				'Appointment created.',
+				`Appointment created with ${selectedUser?.name}.`,
 				'success'
 			);
 			resetAll();
@@ -88,8 +89,8 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 			<ModalContent>
 				<ModalHeader>Set Appointment with {selectedUser?.name}</ModalHeader>
 				<ModalCloseButton />
-				<ModalBody pb={6}>
-					<form onSubmit={handleSubmit}>
+				<form onSubmit={handleSubmit}>
+					<ModalBody pb={6} gap={4}>
 						<Input
 							placeholder='Title'
 							mt={4}
@@ -111,6 +112,7 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 							mt={4}
 							value={date}
 							onChange={e => setDate(e.target.value)}
+							min={new Date().toISOString().split('T')[0]}
 							required
 						/>
 
@@ -118,20 +120,31 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 							type='time'
 							mt={4}
 							value={time}
+							min={
+								date === new Date().toISOString().split('T')[0]
+									? currentTime
+									: ''
+							}
 							onChange={e => setTime(e.target.value)}
 							required
 						/>
 
-						<Button type='submit' colorScheme='green' mt={4}>
-							Create Appointment
-						</Button>
-					</form>
-				</ModalBody>
-				<ModalFooter>
-					<Button colorScheme='red' onClick={onClose}>
-						Cancel
-					</Button>
-				</ModalFooter>
+						<Flex
+							justifyContent={'flex-end'}
+							gap={2}
+							alignItems={'center'}
+							mt={4}
+						>
+							<Button colorScheme='red' onClick={onClose}>
+								Cancel
+							</Button>
+
+							<Button type='submit' colorScheme='green'>
+								Create Appointment
+							</Button>
+						</Flex>
+					</ModalBody>
+				</form>
 			</ModalContent>
 		</Modal>
 	);

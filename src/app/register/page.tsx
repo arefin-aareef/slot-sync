@@ -39,7 +39,7 @@ const RegisterPage: FC<RegisterPageProps> = ({}) => {
 				});
 			}
 
-			showToast('Registration Successful.', 'User Registered', 'success');
+			showToast('Registration successful.', 'User registered and logged in.', 'success');
 			router.push('/');
 		} catch (error) {
 			showToast('Registration failed.', 'Please try again.', 'error');
