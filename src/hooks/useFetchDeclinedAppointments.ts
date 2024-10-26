@@ -13,11 +13,17 @@ const useFetchDeclinedAppointments = () => {
 	useEffect(() => {
 		try {
 			setLoading(true);
-			const filteredAppointments = appointments?.filter(
-				appointment =>
+			const currentDateTime = new Date();
+			const filteredAppointments = appointments?.filter(appointment => {
+				const appointmentDateTime = new Date(
+					`${appointment?.date}T${appointment?.time}`
+				);
+				return (
 					appointment?.appointee === user?.uid &&
-					appointment?.status === 'declined'
-			);
+					appointment?.status === 'declined' &&
+					appointmentDateTime > currentDateTime
+				);
+			});
 			setDeclinedAppointments(filteredAppointments);
 		} catch (error) {
 			setError('Error filtering pending appointments');

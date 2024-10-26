@@ -13,11 +13,17 @@ const useFetchAcceptedAppointments = () => {
 	useEffect(() => {
 		try {
 			setLoading(true);
-			const filteredAppointments = appointments?.filter(
-				appointment =>
+			const currentDateTime = new Date();
+			const filteredAppointments = appointments?.filter(appointment => {
+				const appointmentDateTime = new Date(
+					`${appointment?.date}T${appointment?.time}`
+				);
+				return (
 					appointment?.invitee === user?.uid &&
-					appointment?.status === 'accepted'
-			);
+					appointment?.status === 'accepted' &&
+					appointmentDateTime > currentDateTime
+				);
+			});
 			setAcceptedAppointments(filteredAppointments);
 		} catch (error) {
 			setError('Error filtering pending appointments');

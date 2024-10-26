@@ -24,7 +24,7 @@ const LoginPage: FC<LoginPageProps> = ({}) => {
 			showToast('Login successful.', 'User logged in', 'success');
 			router.push('/');
 		} catch (error) {
-			showToast('Login failed.', 'Please check your credentials.', 'error');
+			showToast('Login failed.', `${error}`, 'error');
 			console.log('Registration error: ', error);
 		}
 	};

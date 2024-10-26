@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import Column from './Column';
 import { Button, Flex, FlexProps, Text } from '@chakra-ui/react';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -12,10 +12,9 @@ type AppointmentCardProps = FlexProps & {
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 	const { user } = useFetchAUser();
-
-	console.log('user', user);
-
 	const showToast = useCustomToast();
+	const audioRef = useRef<HTMLAudioElement | null>(null);
+	const [isPlaying, setIsPlaying] = useState(false);
 
 	const updateAppointmentStatus = async (newStatus: string) => {
 		try {
@@ -36,8 +35,19 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 		`${appointment.date}T${appointment.time}`
 	);
 	const currentDateTime = new Date();
-	console.log('appointmentDateTime', appointmentDateTime);
-	console.log('currentDateTime', currentDateTime);
+	const isPastAppointment = currentDateTime > appointmentDateTime;
+
+	const toggleAudioPlayback = () => {
+		if (audioRef.current) {
+			if (isPlaying) {
+				audioRef.current.pause();
+			} else {
+				audioRef.current.play();
+			}
+			setIsPlaying(!isPlaying);
+		}
+	};
+
 	return (
 		<Column
 			key={appointment.id}
@@ -53,18 +63,43 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 			<Text>Date: {appointment.date}</Text>
 			<Text>Time: {appointment.time}</Text>
 			<Text>Status: {appointment.status}</Text>
-			{appointment.status === 'pending' &&
+
+			{/* Audio section */}
+			{appointment.audioMessage && (
+				<Flex direction='column' >
+					<Text>Audio Message: recorded-audio.wav</Text>
+					<Flex>
+						<Button
+							size='sm'
+							colorScheme={isPlaying ? 'red' : 'blue'}
+							onClick={toggleAudioPlayback}
+							mt={2}
+						>
+							{isPlaying ? 'Pause Audio' : 'Play Audio'}
+						</Button>
+					</Flex>
+					<audio
+						ref={audioRef}
+						src={appointment.audioMessage}
+						onEnded={() => setIsPlaying(false)}
+					/>
+				</Flex>
+			)}
+
+			{/* Action buttons */}
+			{!isPastAppointment &&
+				appointment.status === 'pending' &&
 				appointment?.invitee === user?.uid && (
 					<Flex gap={2}>
 						<Button
-							size={'sm'}
+							size='sm'
 							colorScheme='green'
 							onClick={() => updateAppointmentStatus('accepted')}
 						>
 							Accept
 						</Button>
 						<Button
-							size={'sm'}
+							size='sm'
 							colorScheme='red'
 							onClick={() => updateAppointmentStatus('declined')}
 						>
@@ -72,11 +107,12 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 						</Button>
 					</Flex>
 				)}
-			{appointment?.status === 'pending' &&
+			{!isPastAppointment &&
+				appointment?.status === 'pending' &&
 				appointment?.appointee === user?.uid && (
-					<Flex gap={2}>
+					<Flex>
 						<Button
-							size={'sm'}
+							size='sm'
 							colorScheme='red'
 							onClick={() => updateAppointmentStatus('canceled')}
 						>

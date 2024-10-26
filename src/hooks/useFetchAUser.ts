@@ -11,7 +11,7 @@ const useFetchAUser = () => {
 		try {
 			setLoading(true);
 			auth.onAuthStateChanged(async (user: any) => {
-				const docRef = doc(db, 'Users', user.uid);
+				const docRef = doc(db, 'Users', user?.uid);
 				const docSnap = await getDoc(docRef);
 				if (docSnap.exists()) {
 					setUser(docSnap.data());

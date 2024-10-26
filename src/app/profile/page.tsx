@@ -24,6 +24,8 @@ const ProfilePage: FC<ProfilePageProps> = ({}) => {
 	const { canceledAppointments } = useFetchCanceledAppointments();
 	const { pastAppointments } = useFetchPastAppointments();
 
+	console.log('pastAppointments', pastAppointments);
+
 	if (authLoading) {
 		return <Loader />;
 	}

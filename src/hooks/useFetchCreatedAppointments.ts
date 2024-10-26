@@ -13,11 +13,17 @@ const useFetchCreatedAppointments = () => {
 	useEffect(() => {
 		try {
 			setLoading(true);
-			const filteredAppointments = appointments?.filter(
-				appointment =>
+			const currentDateTime = new Date();
+			const filteredAppointments = appointments?.filter(appointment => {
+				const appointmentDateTime = new Date(
+					`${appointment?.date}T${appointment?.time}`
+				);
+				return (
 					appointment?.appointee === user?.uid &&
-					appointment?.status === 'pending'
-			);
+					appointment?.status === 'pending' &&
+					appointmentDateTime > currentDateTime
+				);
+			});
 			setCreatedAppointments(filteredAppointments);
 		} catch (error) {
 			setError('Error filtering pending appointments');
@@ -25,7 +31,7 @@ const useFetchCreatedAppointments = () => {
 		} finally {
 			setLoading(false);
 		}
-	}, [user, appointments, loading]);
+	}, [user, appointments]);
 
 	return { createdAppointments, loading, error };
 };

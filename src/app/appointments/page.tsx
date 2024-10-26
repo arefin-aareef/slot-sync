@@ -1,11 +1,5 @@
 'use client';
-import Column from '@/components/Column';
-import Loader from '@/components/Loader';
-import PageLayout from '@/components/PageLayout';
-import useCustomToast from '@/hooks/useCustomToast';
-import useFetchAllAppointments from '@/hooks/useFetchAllAppointments';
-import useFetchAUser from '@/hooks/useFetchAUser';
-import useRequireAuth from '@/hooks/useRequireAuth';
+import React, { FC, useRef, useState } from 'react';
 import {
 	Table,
 	TableContainer,
@@ -20,18 +14,24 @@ import {
 	Select,
 } from '@chakra-ui/react';
 import { doc, updateDoc } from 'firebase/firestore';
-import React, { FC, useState } from 'react';
-import { db } from '../../../firebase';
 import moment from 'moment';
+import Column from '@/components/Column';
+import Loader from '@/components/Loader';
+import PageLayout from '@/components/PageLayout';
+import useCustomToast from '@/hooks/useCustomToast';
+import useFetchAllAppointments from '@/hooks/useFetchAllAppointments';
+import useFetchAUser from '@/hooks/useFetchAUser';
+import useRequireAuth from '@/hooks/useRequireAuth';
+import { db } from '../../../firebase';
 
-type AppointmentPageProps = {};
-
-const AppointmentPage: FC<AppointmentPageProps> = ({}) => {
+const AppointmentPage: FC = () => {
 	const { authLoading } = useRequireAuth();
 	const { appointments } = useFetchAllAppointments();
 	const { user } = useFetchAUser();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [sortOrder, setSortOrder] = useState<'latest' | 'oldest'>('latest');
+	const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
+	const audioRef = useRef<HTMLAudioElement | null>(null);
 
 	const currentDateTime = new Date();
 
@@ -70,7 +70,7 @@ const AppointmentPage: FC<AppointmentPageProps> = ({}) => {
 
 	const showToast = useCustomToast();
 
-	const updateAppointmentStatus: any = async (newStatus: string, id: string) => {
+	const updateAppointmentStatus = async (newStatus: string, id: string) => {
 		try {
 			const appointmentRef = doc(db, 'appointments', id);
 			await updateDoc(appointmentRef, { status: newStatus });
@@ -82,6 +82,19 @@ const AppointmentPage: FC<AppointmentPageProps> = ({}) => {
 			window.location.reload();
 		} catch (error) {
 			console.error('Error updating appointment status:', error);
+		}
+	};
+
+	const toggleAudioPlayback = (audioUrl: string, appointmentId: string) => {
+		if (audioRef.current) {
+			if (playingAudioId === appointmentId) {
+				audioRef.current.pause();
+				setPlayingAudioId(null);
+			} else {
+				audioRef.current.src = audioUrl;
+				audioRef.current.play();
+				setPlayingAudioId(appointmentId);
+			}
 		}
 	};
 
@@ -118,78 +131,108 @@ const AppointmentPage: FC<AppointmentPageProps> = ({}) => {
 								<Th>Time</Th>
 								<Th>Status</Th>
 								<Th>Type</Th>
+								<Th>Audio</Th>
 								<Th>Action</Th>
 							</Tr>
 						</Thead>
 						<Tbody>
 							{sortedAppointments.length === 0 ? (
 								<Tr>
-									<Td colSpan={6} textAlign='center'>
+									<Td colSpan={7} textAlign='center'>
 										No appointments found.
 									</Td>
 								</Tr>
 							) : (
-								sortedAppointments.map((appointment: any) => (
-									<Tr key={appointment.id}>
-										<Td>{appointment.title}</Td>
-										<Td>{moment(appointment.date).format('DD MMM YYYY')}</Td>
-										<Td>{appointment.time}</Td>
-										<Td>{appointment.status}</Td>
-										<Td>{appointment.type}</Td>
-										<Td>
-											{appointment.status === 'pending' &&
-												appointment?.invitee === user?.uid && (
-													<Flex gap={2}>
-														<Button
-															size={{ base: 'xs', md: 'sm' }}
-															colorScheme='green'
-															onClick={() =>
-																updateAppointmentStatus(
-																	'accepted',
-																	appointment.id
-																)
-															}
-														>
-															Accept
-														</Button>
-														<Button
-															size={{ base: 'xs', md: 'sm' }}
-															colorScheme='red'
-															onClick={() =>
-																updateAppointmentStatus(
-																	'declined',
-																	appointment.id
-																)
-															}
-														>
-															Decline
-														</Button>
-													</Flex>
+								sortedAppointments.map((appointment: any) => {
+									const appointmentDateTime = new Date(
+										`${appointment.date}T${appointment.time}`
+									);
+									return (
+										<Tr key={appointment.id}>
+											<Td>{appointment.title}</Td>
+											<Td>{moment(appointment.date).format('DD MMM YYYY')}</Td>
+											<Td>{appointment.time}</Td>
+											<Td>{appointment.status}</Td>
+											<Td>{appointment.type}</Td>
+											<Td>
+												{appointment.audioMessage && (
+													<Button
+													w='60px'
+														size={{ base: 'xs', md: 'sm' }}
+														colorScheme={
+															playingAudioId === appointment.id ? 'red' : 'blue'
+														}
+														onClick={() =>
+															toggleAudioPlayback(
+																appointment.audioMessage,
+																appointment.id
+															)
+														}
+													>
+														{playingAudioId === appointment.id
+															? 'Pause'
+															: 'Play'}
+													</Button>
 												)}
-											{appointment?.status === 'pending' &&
-												appointment?.appointee === user?.uid && (
-													<Flex gap={2}>
-														<Button
-															size={{ base: 'xs', md: 'sm' }}
-															colorScheme='red'
-															onClick={() =>
-																updateAppointmentStatus(
-																	'canceled',
-																	appointment.id
-																)
-															}
-														>
-															Cancel
-														</Button>
-													</Flex>
-												)}
-										</Td>
-									</Tr>
-								))
+											</Td>
+											<Td>
+												{appointmentDateTime >= currentDateTime &&
+													appointment.status === 'pending' &&
+													appointment?.invitee === user?.uid && (
+														<Flex gap={2}>
+															<Button
+																size={{ base: 'xs', md: 'sm' }}
+																colorScheme='green'
+																onClick={() =>
+																	updateAppointmentStatus(
+																		'accepted',
+																		appointment.id
+																	)
+																}
+															>
+																Accept
+															</Button>
+															<Button
+																size={{ base: 'xs', md: 'sm' }}
+																colorScheme='red'
+																onClick={() =>
+																	updateAppointmentStatus(
+																		'declined',
+																		appointment.id
+																	)
+																}
+															>
+																Decline
+															</Button>
+														</Flex>
+													)}
+												{appointmentDateTime >= currentDateTime &&
+													appointment?.status === 'pending' &&
+													appointment?.appointee === user?.uid && (
+														<Flex gap={2}>
+															<Button
+																size={{ base: 'xs', md: 'sm' }}
+																colorScheme='red'
+																onClick={() =>
+																	updateAppointmentStatus(
+																		'canceled',
+																		appointment.id
+																	)
+																}
+															>
+																Cancel
+															</Button>
+														</Flex>
+													)}
+											</Td>
+										</Tr>
+									);
+								})
 							)}
 						</Tbody>
 					</Table>
 				</TableContainer>
+				<audio ref={audioRef} onEnded={() => setPlayingAudioId(null)} />
 			</Column>
 		</PageLayout>
 	);

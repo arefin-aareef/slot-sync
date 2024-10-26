@@ -21,7 +21,8 @@ const useFetchPastAppointments = () => {
 				);
 
 				return (
-					appointment?.appointee === user?.uid &&
+					(appointment?.appointee === user?.uid ||
+						appointment?.invitee === user?.uid) &&
 					appointmentDateTime < currentDateTime
 				);
 			});

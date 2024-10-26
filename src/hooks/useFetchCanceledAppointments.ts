@@ -13,11 +13,17 @@ const useFetchCanceledAppointments = () => {
 	useEffect(() => {
 		try {
 			setLoading(true);
-			const filteredAppointments = appointments?.filter(
-				appointment =>
+			const currentDateTime = new Date();
+			const filteredAppointments = appointments?.filter(appointment => {
+				const appointmentDateTime = new Date(
+					`${appointment?.date}T${appointment?.time}`
+				);
+				return (
 					appointment?.invitee === user?.uid &&
-					appointment?.status === 'canceled'
-			);
+					appointment?.status === 'canceled' &&
+					appointmentDateTime > currentDateTime
+				);
+			});
 			setCanceledAppointments(filteredAppointments);
 		} catch (error) {
 			setError('Error filtering pending appointments');
