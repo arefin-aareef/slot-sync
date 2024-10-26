@@ -7,7 +7,6 @@ import React, { FC, useState } from 'react';
 import { auth, db } from '../../../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import useToast from '@/hooks/useCustomToast';
 import useCustomToast from '@/hooks/useCustomToast';
 import { useRouter } from 'next/navigation';
 
@@ -42,7 +41,7 @@ const RegisterPage: FC<RegisterPageProps> = ({}) => {
 			showToast('Registration successful.', 'User registered and logged in.', 'success');
 			router.push('/');
 		} catch (error) {
-			showToast('Registration failed.', 'Please try again.', 'error');
+			showToast('Registration failed.', `${error}`, 'error');
 			console.log('Registration error: ', error);
 		}
 	};

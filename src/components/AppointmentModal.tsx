@@ -10,6 +10,7 @@ import {
 	Input,
 	Textarea,
 	Flex,
+	ModalOverlay,
 } from '@chakra-ui/react';
 import React, { FC, useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
@@ -76,6 +77,11 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 			onClose();
 		} catch (error) {
 			console.error('Error adding document: ', error);
+			showToast(
+				'Error creating appointment.',
+				` ${error}.`,
+				'error'
+			);
 		}
 	};
 
@@ -86,6 +92,7 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
 			onClose={onClose}
 			isCentered={true}
 		>
+			<ModalOverlay />
 			<ModalContent>
 				<ModalHeader>Set Appointment with {selectedUser?.name}</ModalHeader>
 				<ModalCloseButton />
